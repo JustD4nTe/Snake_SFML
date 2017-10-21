@@ -2,7 +2,6 @@
 #include <iostream>
 #include <ctime>
 #include <cstdlib>
-#include <fstream>
 
 #define SNAKE_SIZE 20
 
@@ -22,15 +21,10 @@ int main(){
 	SnakeElements[0] = new sf::RectangleShape(sf::Vector2f(SNAKE_SIZE, SNAKE_SIZE));
 	SnakeElements[0]->setPosition(Window.getSize().x / 2, Window.getSize().y / 2);
 
-	std::fstream plik("log.txt", std::ios::out);
-	//plik << NULL;
-	plik.close();
-
-
 	for (int i = 1; i < 7; i++) {
 		SnakeElements[i] = new sf::RectangleShape(sf::Vector2f(SNAKE_SIZE, SNAKE_SIZE));
 		SnakeElements[i]->setPosition(SnakeElements[i - 1]->getPosition().x, SnakeElements[i - 1]->getPosition().y + 20);
-		SnakeElements[i]->setFillColor(sf::Color(8 * i, 32 * i, 16 * i));
+		SnakeElements[i]->setFillColor(sf::Color(32 * i, 16 * i, 8 * i));
 	}
 
 	sf::Clock timer;
@@ -41,14 +35,6 @@ int main(){
 	
 
 	float SnakeNextMove = 500, SnakeMoveTimeCounter = 0, SnakeSpeed = 800;
-
-	std::fstream plasik("log.txt", std::ios::app);
-
-	for (int i = 0; i < 7; i++)
-		plasik << "MoveCounter: " << MoveCounter << "\ti: " << i << "\tx: " << SnakeElements[i]->getPosition().x << "\ty: " << SnakeElements[i]->getPosition().y << std::endl;
-
-	plasik << std::endl;
-	plasik.close();
 
 	while (Window.isOpen())	{
 		sf::Event event;
@@ -135,14 +121,6 @@ int main(){
 void Move(sf::RectangleShape* snake[], unsigned int length) {
 	for (unsigned int i = length; i > 0; i--)
 		snake[i]->setPosition(snake[i - 1]->getPosition());
-
-	std::fstream plik("log.txt", std::ios::app);
-
-	for (int i = 0; i < 3; i++)
-		plik << "MoveCounter: " << MoveCounter << "\ti: " << i << "\tx: " << snake[i]->getPosition().x << "\ty: " << snake[i]->getPosition().y << std::endl;
-
-	plik << std::endl;
-	plik.close();
 }
 
 void Draw(sf::RenderWindow &win, sf::RectangleShape* snake[]) {
