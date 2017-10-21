@@ -8,16 +8,16 @@
 sf::Vector2f newFruit(sf::RenderWindow &win);
 
 void Move(sf::RectangleShape* snake[], unsigned int length);
-void Draw(sf::RenderWindow &win, sf::RectangleShape* snake[]);
+void Draw(sf::RenderWindow &win, sf::RectangleShape* snake[], unsigned int length);
 
 
 int main(){
 	sf::RenderWindow Window(sf::VideoMode(500, 500), "SFML works!");
-	sf::RectangleShape* SnakeElements[625];
+	sf::RectangleShape* SnakeElements[624];
 	sf::RectangleShape Fruit(sf::Vector2f(SNAKE_SIZE, SNAKE_SIZE));
 	sf::Clock timer;
 	
-	unsigned int SnakeLength = 6;
+	unsigned int SnakeLength = 1;
 	unsigned int Direction = 1;
 	
 	float SnakeNextMove = 500, SnakeMoveTimeCounter = 0, SnakeSpeed = 800;
@@ -25,11 +25,11 @@ int main(){
 	SnakeElements[0] = new sf::RectangleShape(sf::Vector2f(SNAKE_SIZE, SNAKE_SIZE));
 	SnakeElements[0]->setPosition(260, 260);
 
-	for (int i = 1; i < 7; i++) {
-		SnakeElements[i] = new sf::RectangleShape(sf::Vector2f(SNAKE_SIZE, SNAKE_SIZE));
-		SnakeElements[i]->setPosition(SnakeElements[i - 1]->getPosition().x, SnakeElements[i - 1]->getPosition().y + 20);
-		SnakeElements[i]->setFillColor(sf::Color(16 * i, 16 * i, 8 * i));
-	}
+	//for (int i = 1; i < 2; i++) {
+	//	SnakeElements[i] = new sf::RectangleShape(sf::Vector2f(SNAKE_SIZE, SNAKE_SIZE));
+	//	SnakeElements[i]->setPosition(SnakeElements[i - 1]->getPosition().x, SnakeElements[i - 1]->getPosition().y + 20);
+	//	SnakeElements[i]->setFillColor(sf::Color(16 * i, 16 * i, 8 * i));
+	//}
 
 	Fruit.setFillColor(sf::Color(0xFF, 0x66, 0x33));
 	Fruit.setPosition(newFruit(Window));
@@ -37,6 +37,10 @@ int main(){
 	while (Window.isOpen())	{
 		if (Fruit.getPosition() == SnakeElements[0]->getPosition()) {
 			Fruit.setPosition(newFruit(Window));
+			++SnakeLength;
+			SnakeElements[SnakeLength - 1] = new sf::RectangleShape(sf::Vector2f(SNAKE_SIZE, SNAKE_SIZE));
+			SnakeElements[SnakeLength - 1]->setPosition(SnakeElements[SnakeLength - 2]->getPosition().x, SnakeElements[SnakeLength - 2]->getPosition().y);
+			SnakeElements[SnakeLength - 1]->setFillColor(sf::Color(5 * SnakeLength, 10 * SnakeLength, 1 * SnakeLength));
  		}
 
 		sf::Event event;
@@ -76,7 +80,9 @@ int main(){
 		SnakeMoveTimeCounter += SnakeSpeed * timer.restart().asSeconds();
 
 		if (SnakeMoveTimeCounter >= SnakeNextMove) {
-			Move(SnakeElements, SnakeLength);
+			if(SnakeLength > 1)
+				Move(SnakeElements, SnakeLength);
+
 			switch (Direction){
 			case 1:
 				SnakeElements[0]->move(0, -SNAKE_SIZE);	//	UP
@@ -103,7 +109,7 @@ int main(){
 		}
 
 		Window.clear();
-		Draw(Window, &SnakeElements[0]);
+		Draw(Window, &SnakeElements[0], SnakeLength);
 		Window.draw(Fruit);
 		Window.display();
 	}
@@ -121,11 +127,11 @@ sf::Vector2f newFruit(sf::RenderWindow &win) {
 }
 
 void Move(sf::RectangleShape* snake[], unsigned int length) {
-	for (unsigned int i = length; i > 0; i--)
+	for (unsigned int i = length - 1 ; i > 0; --i)
 		snake[i]->setPosition(snake[i - 1]->getPosition());
 }
 
-void Draw(sf::RenderWindow &win, sf::RectangleShape* snake[]) {
-	for (int i = 0; i < 7; i++)
+void Draw(sf::RenderWindow &win, sf::RectangleShape* snake[], unsigned int length) {
+	for (int i = 0; i < length; ++i)
 		win.draw(*snake[i]);
 }
