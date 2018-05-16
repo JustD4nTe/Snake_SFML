@@ -5,6 +5,9 @@
 
 #define SNAKE_SIZE 20
 
+#define RES_X 500
+#define RES_Y 500
+
 #define RED 20
 #define GREEN 10
 #define BLUE 20
@@ -15,12 +18,12 @@ void Move(sf::RectangleShape* snake[], unsigned int length);
 void Draw(sf::RenderWindow &win, sf::RectangleShape* snake[], unsigned int length);
 bool Collision(sf::RectangleShape* snake[], unsigned int length);
 
-int main(){
-	sf::RenderWindow Window(sf::VideoMode(500, 500), "SFML works!");
+int main() {
+	sf::RenderWindow Window(sf::VideoMode(RES_X, RES_Y), "Snake by JustD4nTe");
 	sf::RectangleShape* SnakeElements[624];
 	sf::RectangleShape Fruit(sf::Vector2f(SNAKE_SIZE, SNAKE_SIZE));
 	sf::Clock timer;
-	
+
 	unsigned int SnakeLength = 1;
 	unsigned int Direction = 1;
 
@@ -35,9 +38,9 @@ int main(){
 	Fruit.setFillColor(sf::Color(0xFF, 0x66, 0x33));
 	Fruit.setPosition(newFruit(Window));
 
-	while (Window.isOpen())	{
+	while (Window.isOpen()) {
 		if (Collision(&SnakeElements[0], SnakeLength))
-			std::cout << "END\n";
+			break;
 
 
 		sf::Event event;
@@ -53,7 +56,7 @@ int main(){
 			if (Direction != 2)
 				Direction = 1;
 		}
-		
+
 		else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
 			if (Direction != 1)
 				Direction = 2;
@@ -73,10 +76,10 @@ int main(){
 		SnakeMoveTimeCounter += SnakeSpeed * timer.restart().asSeconds();
 
 		if (SnakeMoveTimeCounter >= SnakeNextMove) {
-			if(SnakeLength > 1)
+			if (SnakeLength > 1)
 				Move(SnakeElements, SnakeLength);
 
-			switch (Direction){
+			switch (Direction) {
 			case 1:
 				SnakeElements[0]->move(0, -SNAKE_SIZE);	//	UP
 				break;
@@ -122,6 +125,32 @@ int main(){
 		Window.display();
 	}
 
+	sf::RenderWindow WinEndGame(sf::VideoMode(400, 100), "KONIEC GRY");
+
+	sf::Text text;
+	sf::Font font;
+	if (!font.loadFromFile("arial.ttf"))
+		std::cout << "NOT FONT";
+	
+	std::string strEndGame("Wynik:\n");
+	strEndGame.append(std::to_string(SnakeLength - 1));
+	strEndGame.append("\nKliknij klawisz Esc aby wyjsc...");
+	
+	text.setFont(font); 
+	text.setString(strEndGame);
+	text.setCharacterSize(24); 
+	text.setFillColor(sf::Color::White);
+	while (WinEndGame.isOpen()) {
+		sf::Event event;
+		while (WinEndGame.pollEvent(event)) {
+			if (event.type == sf::Event::Closed || event.key.code == sf::Keyboard::Escape) {
+				WinEndGame.close();
+				Window.close();
+			}
+		}
+		WinEndGame.draw(text);
+		WinEndGame.display();
+	}
 	return 0;
 }
 
@@ -146,7 +175,7 @@ void Draw(sf::RenderWindow &win, sf::RectangleShape* snake[], unsigned int lengt
 
 bool Collision(sf::RectangleShape* snake[], unsigned int length) {
 	sf::RectangleShape HeadOfSnake = *snake[0];
-	if (HeadOfSnake.getPosition().x >= 500 || HeadOfSnake.getPosition().x < 0 || HeadOfSnake.getPosition().y >= 500 || HeadOfSnake.getPosition().y < 0)
+	if (HeadOfSnake.getPosition().x >= RES_X || HeadOfSnake.getPosition().x < 0 || HeadOfSnake.getPosition().y >= RES_Y || HeadOfSnake.getPosition().y < 0)
 		return true;
 
 	for (int i = 2; i < length; i++) {
