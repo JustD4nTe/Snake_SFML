@@ -13,7 +13,7 @@ sf::Vector2f newFruit(sf::RenderWindow &win);
 
 void Move(sf::RectangleShape* snake[], unsigned int length);
 void Draw(sf::RenderWindow &win, sf::RectangleShape* snake[], unsigned int length);
-
+bool Collision(sf::RectangleShape* snake[], unsigned int length);
 
 int main(){
 	sf::RenderWindow Window(sf::VideoMode(500, 500), "SFML works!");
@@ -36,25 +36,9 @@ int main(){
 	Fruit.setPosition(newFruit(Window));
 
 	while (Window.isOpen())	{
-		if (Fruit.getPosition() == SnakeElements[0]->getPosition()) {
-			Fruit.setPosition(newFruit(Window));
+		if (Collision(&SnakeElements[0], SnakeLength))
+			std::cout << "END\n";
 
-			SnakeElements[SnakeLength] = new sf::RectangleShape(sf::Vector2f(SNAKE_SIZE, SNAKE_SIZE));
-			SnakeElements[SnakeLength]->setPosition(SnakeElements[SnakeLength - 1]->getPosition().x, SnakeElements[SnakeLength - 1]->getPosition().y);
-			//std::cout << "SnakeLength: " << SnakeLength << "\tGreen: " << Green << std::endl;
-			if (GreenCounter == 20) {
-				isReverseGreen = (isReverseGreen ? false : true);
-				GreenCounter = 1;
-			}
-
-			if (isReverseGreen)
-				Green = (255 - (GREEN * GreenCounter++));
-			else
-				Green = (GREEN * GreenCounter++) + 60;
-
-			SnakeElements[SnakeLength]->setFillColor(sf::Color(RED, Green, BLUE));
-			++SnakeLength;
- 		}
 
 		sf::Event event;
 		while (Window.pollEvent(event)) {
@@ -112,6 +96,26 @@ int main(){
 			SnakeMoveTimeCounter = 0;
 		}
 
+		if (Fruit.getPosition() == SnakeElements[0]->getPosition()) {
+			Fruit.setPosition(newFruit(Window));
+
+			SnakeElements[SnakeLength] = new sf::RectangleShape(sf::Vector2f(SNAKE_SIZE, SNAKE_SIZE));
+			SnakeElements[SnakeLength]->setPosition(SnakeElements[SnakeLength - 1]->getPosition().x, SnakeElements[SnakeLength - 1]->getPosition().y);
+			//std::cout << "SnakeLength: " << SnakeLength << "\tGreen: " << Green << std::endl;
+			if (GreenCounter == 20) {
+				isReverseGreen = (isReverseGreen ? false : true);
+				GreenCounter = 1;
+			}
+
+			if (isReverseGreen)
+				Green = (255 - (GREEN * GreenCounter++));
+			else
+				Green = (GREEN * GreenCounter++) + 60;
+
+			SnakeElements[SnakeLength]->setFillColor(sf::Color(RED, Green, BLUE));
+			++SnakeLength;
+		}
+
 		Window.clear();
 		Draw(Window, &SnakeElements[0], SnakeLength);
 		Window.draw(Fruit);
@@ -138,4 +142,17 @@ void Move(sf::RectangleShape* snake[], unsigned int length) {
 void Draw(sf::RenderWindow &win, sf::RectangleShape* snake[], unsigned int length) {
 	for (int i = 1; i <= length; ++i)
 		win.draw(*snake[length - i]);
+}
+
+bool Collision(sf::RectangleShape* snake[], unsigned int length) {
+	sf::RectangleShape HeadOfSnake = *snake[0];
+	if (HeadOfSnake.getPosition().x >= 500 || HeadOfSnake.getPosition().x < 0 || HeadOfSnake.getPosition().y >= 500 || HeadOfSnake.getPosition().y < 0)
+		return true;
+
+	for (int i = 2; i < length; i++) {
+		if (HeadOfSnake.getPosition() == snake[i]->getPosition())
+			return true;
+	}
+
+	return false;
 }
